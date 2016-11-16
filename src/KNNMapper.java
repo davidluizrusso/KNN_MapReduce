@@ -1,18 +1,24 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import javax.naming.Context;
-import javax.security.auth.login.Configuration;
+import org.apache.hadoop.conf.Configuration;
+import javax.xml.soap.Text;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.mapreduce.Mapper;
 
 
-public class KNNMapper {
+public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	
 	public void setup (Context context) {
 
 		try {
 
-		  Configuration conf = context.getConfiguration();
+		  Configuration conf = context.getConfiguration();;
 
 		  FileSystem fs = FileSystem.get(conf);
 
@@ -31,6 +37,8 @@ public class KNNMapper {
 		  System.exit(0);
 
 		}
+		
+	}
 
 		private void setupTrainData(FileSystem fs, String filename) throws IOException {
 
@@ -58,9 +66,10 @@ public class KNNMapper {
 
 		  }
 
-		  String line = reader.readLine();
-
+		  // String line = reader.readLine();
 		  // read line by line, parse to desired data structure.
+		  String line = "The cat purred loudly.";
+          context.write(line);
 
 		}
 

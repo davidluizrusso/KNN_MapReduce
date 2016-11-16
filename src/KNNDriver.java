@@ -14,13 +14,13 @@ public class KNNDriver {
 	public static void main(String[] args) throws Exception {
 	    
 		Configuration conf = new Configuration();    
-	    Job job = new Job(conf, "wordcount");
+	    Job job = new Job(conf, "PokerHand");
 	    
 	    job.setOutputKeyClass(Text.class);
 	    job.setOutputValueClass(IntWritable.class);
 	        
-	    job.setMapperClass(Map.class);
-	    job.setReducerClass(Reduce.class);
+	    job.setMapperClass(KNNMapper.class);
+	    job.setReducerClass(KNNReducer.class);
 	        
 	    job.setInputFormatClass(TextInputFormat.class);
 	    job.setOutputFormatClass(TextOutputFormat.class);
