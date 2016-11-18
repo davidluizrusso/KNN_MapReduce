@@ -30,6 +30,6 @@ public class KNNDriver {
 	        
 	    job.setJarByClass(KNNDriver.class);
 	    job.waitForCompletion(true);
-	 }
+	 } // end Main method
 
-}
+} // end KNNDriver CLass

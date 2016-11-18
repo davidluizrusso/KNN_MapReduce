@@ -6,4 +6,4 @@ public class KNNReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
 	
 	
-} // end Reducer class 
+} // end KNNReducer class 
