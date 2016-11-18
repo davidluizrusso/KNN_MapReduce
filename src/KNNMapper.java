@@ -1,29 +1,61 @@
 import java.io.BufferedReader;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
 import javax.naming.Context;
+
 import org.apache.hadoop.conf.Configuration;
+
 import javax.xml.soap.Text;
+
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
 public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	
-	public void setup (Context context) {
+	ArrayList<PokerHandTrain> train = new ArrayList<PokerHandTrain>();
+	ArrayList<PokerHandTest> test = new ArrayList<PokerHandTest>();
+	
 
-		
-        
+	
+	public void setup(Context context) throws IOException, InterruptedException
+	{
+		if (context.getCacheFiles() != null && context.getCacheFiles().length > 0)
+		{
+			Configuration conf = context.getConfiguration();
+			FileSystem fs = FileSystem.get(conf);
+			
+			String filenameTrain = context.getConfiguration().get("traindata");
+			String filenameTest = context.getConfiguration().get("testdata");
+			
+			Path pathTrain = Paths.get(filenameTrain);
+			Path pathTest = Paths.get(filenameTest);
+			
+			
+			
+			
 
-	} // end setup method
+			
+			
+
+			
+			
+		}
+}
 	
 	
 	
-	class PokerHandTrain {
+	class PokerHandTrain implements WritableComparable<PokerHandTrain> {
 		
 		/* 
 		 * The PokerHandTrain class is for holding data of the form
@@ -59,7 +91,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         int rank4; // rank of fourth card
         int suit5; // suit of fifth card
         int rank5; // rank of fifth card
-        int identity; // name of hand of card
+        int identity; // name of hand 
         
         @Override
 		public String toString() {
@@ -136,10 +168,28 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		public void setIdentity(int identity) {
 			this.identity = identity;
 		}
+
+		@Override
+		public void readFields(DataInput arg0) throws IOException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void write(DataOutput arg0) throws IOException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int compareTo(PokerHandTrain o) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
 	
 	} // end PokerHandTrain class
 	
-	class PokerHandTest {
+	class PokerHandTest implements WritableComparable<PokerHandTest> {
 		
 		/* 
 		 * The PokerHandTrain class is for holding data of the form
@@ -160,6 +210,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         int rank4; // rank of fourth card
         int suit5; // suit of fifth card
         int rank5; // rank of fifth card
+        int predicted; // predicted name of hand
 		
 		@Override
 		public String toString() {
@@ -228,6 +279,21 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		}
 		public void setRank5(int rank5) {
 			this.rank5 = rank5;
+		}
+		@Override
+		public void readFields(DataInput arg0) throws IOException {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void write(DataOutput arg0) throws IOException {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public int compareTo(PokerHandTest o) {
+			// TODO Auto-generated method stub
+			return 0;
 		}
 
         
