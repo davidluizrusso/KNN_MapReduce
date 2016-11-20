@@ -1,23 +1,17 @@
 import java.io.BufferedReader;
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-
-import javax.naming.Context;
+import java.util.List;
+import java.lang.Math;
 
 import org.apache.hadoop.conf.Configuration;
-
-import javax.xml.soap.Text;
-
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
@@ -32,26 +26,24 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	{
 		if (context.getCacheFiles() != null && context.getCacheFiles().length > 0)
 		{
+			// establish configuration and file system
 			Configuration conf = context.getConfiguration();
 			FileSystem fs = FileSystem.get(conf);
 			
+			// get training and test data
 			String filenameTrain = context.getConfiguration().get("traindata");
 			String filenameTest = context.getConfiguration().get("testdata");
 			
-			Path pathTrain = Paths.get(filenameTrain);
-			Path pathTest = Paths.get(filenameTest);
+			// set up paths for training and testing data
+			Path pathTrain = new Path(filenameTrain);
+			Path pathTest = new Path(filenameTest);
+			
+			// set up file systems
 			
 			
-			
-			
-
-			
-			
-
-			
-			
-		}
-}
+		} // end error checking 
+		
+	} // end setup method 
 	
 	
 	
