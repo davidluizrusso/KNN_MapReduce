@@ -1,8 +1,11 @@
 import java.io.BufferedReader;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.lang.Math;
 
 import org.apache.hadoop.conf.Configuration;
@@ -12,6 +15,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
@@ -28,7 +32,8 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		{
 			// establish configuration and file system
 			Configuration conf = context.getConfiguration();
-			FileSystem fs = FileSystem.get(conf);
+			FileSystem fsTrain = FileSystem.get(conf);
+			FileSystem fsTest = FileSystem.get(conf);
 			
 			// get training and test data
 			String filenameTrain = context.getConfiguration().get("traindata");
@@ -38,12 +43,137 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			Path pathTrain = new Path(filenameTrain);
 			Path pathTest = new Path(filenameTest);
 			
-			// set up file systems
+			// update file systems
+			fsTrain = pathTrain.getFileSystem(conf);
+			fsTest = pathTest.getFileSystem(conf);
 			
-			
-		} // end error checking 
-		
+			SetupTrainSet(fsTrain, pathTrain.toString());
+			SetupTestSet(fsTest, pathTest.toString());
+				
+		} else {
+			  System.err.println("Error in reading data files");
+			  System.exit(-1);
+			}		
 	} // end setup method 
+	
+	public void SetupTrainSet(FileSystem fs, String filename) throws IOException {
+
+		// This will reference one line at a time
+        	String line = null;
+
+		try {
+			
+			FSDataInputStream fis = fs.open( new Path(filename));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+			// parse each line
+			while((line = reader.readLine()) != null) {
+			
+				// instantiate new instance of PokerHandTrain and StringTokenizer
+				PokerHandTrain phTrain = new PokerHandTrain();
+				StringTokenizer st = new StringTokenizer(line, ",");
+				
+				while (st.hasMoreElements()) {
+					// first card
+					phTrain.setSuit1(Integer.parseInt(st.nextToken()));
+					phTrain.setRank1(Integer.parseInt(st.nextToken()));
+					// second card
+					phTrain.setSuit2(Integer.parseInt(st.nextToken()));
+					phTrain.setRank2(Integer.parseInt(st.nextToken()));
+					// third card
+					phTrain.setSuit3(Integer.parseInt(st.nextToken()));
+					phTrain.setRank3(Integer.parseInt(st.nextToken()));
+					// fourth card
+					phTrain.setSuit4(Integer.parseInt(st.nextToken()));
+					phTrain.setRank4(Integer.parseInt(st.nextToken()));
+					// fifth card
+					phTrain.setSuit5(Integer.parseInt(st.nextToken()));
+					phTrain.setRank5(Integer.parseInt(st.nextToken()));
+					// identity
+					phTrain.setIdentity(Integer.parseInt(st.nextToken()));
+	            }
+
+				
+				train.add(phTrain);
+					
+				}
+
+			//  close files
+            reader.close();
+			fis.close();
+			System.out.println("Finished Setup");
+		}
+
+		catch (IllegalArgumentException ill) {
+			System.err.println(ill.getMessage());
+		}
+		catch (IOException ioe) {
+			System.err.println(ioe.getMessage());
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+ 	} // end SetupTrainSet method
+	
+	
+	public void SetupTestSet(FileSystem fs, String filename) throws IOException {
+
+		// This will reference one line at a time
+        	String line = null;
+
+		try {
+			
+			FSDataInputStream fis = fs.open( new Path(filename));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+			// parse each line
+			while((line = reader.readLine()) != null) {
+			
+				// instantiate new instance of PokerHandTrain and StringTokenizer
+				PokerHandTrain phTrain = new PokerHandTrain();
+				StringTokenizer st = new StringTokenizer(line, ",");
+				
+				while (st.hasMoreElements()) {
+					// first card
+					phTrain.setSuit1(Integer.parseInt(st.nextToken()));
+					phTrain.setRank1(Integer.parseInt(st.nextToken()));
+					// second card
+					phTrain.setSuit2(Integer.parseInt(st.nextToken()));
+					phTrain.setRank2(Integer.parseInt(st.nextToken()));
+					// third card
+					phTrain.setSuit3(Integer.parseInt(st.nextToken()));
+					phTrain.setRank3(Integer.parseInt(st.nextToken()));
+					// fourth card
+					phTrain.setSuit4(Integer.parseInt(st.nextToken()));
+					phTrain.setRank4(Integer.parseInt(st.nextToken()));
+					// fifth card
+					phTrain.setSuit5(Integer.parseInt(st.nextToken()));
+					phTrain.setRank5(Integer.parseInt(st.nextToken()));
+					// identity
+					phTrain.setIdentity(Integer.parseInt(st.nextToken()));
+	            }
+
+				
+				train.add(phTrain);
+					
+				}
+
+			//  close files
+            reader.close();
+			fis.close();
+			System.out.println("Finished Setup");
+		}
+
+		catch (IllegalArgumentException ill) {
+			System.err.println(ill.getMessage());
+		}
+		catch (IOException ioe) {
+			System.err.println(ioe.getMessage());
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+ 	} // end SetupTestSet method
 	
 	
 	
