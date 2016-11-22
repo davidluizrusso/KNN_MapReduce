@@ -18,8 +18,8 @@ public class KNNDriver {
 	    Job job = new Job(conf, "PokerHand");
 
 	    // set testing and training data parameters within the job
+		job.getConfiguration().set("traindata", args[0]);
 		job.getConfiguration().set("testdata", args[1]);
-		job.getConfiguration().set("traindata", args[2]);
 	    
 		// establish the driver, mapper, and reducer classes
 		job.setJarByClass(KNNDriver.class);
@@ -35,8 +35,8 @@ public class KNNDriver {
 	    job.setOutputFormatClass(TextOutputFormat.class);
 	        
 	    // establish input and output directories
-		FileInputFormat.setInputPaths(job, new Path(args[3]));
-	    FileOutputFormat.setOutputPath(job, new Path(args[4]));
+		FileInputFormat.setInputPaths(job, new Path(args[2]));
+	    FileOutputFormat.setOutputPath(job, new Path(args[3]));
 	        
 	    // management parameter set
 	    job.waitForCompletion(true);

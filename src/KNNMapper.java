@@ -34,21 +34,32 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			Configuration conf = context.getConfiguration();
 			FileSystem fsTrain = FileSystem.get(conf);
 			FileSystem fsTest = FileSystem.get(conf);
+			// error check
+			System.out.println("Finished config and file systems.\n");
 			
 			// get training and test data
 			String filenameTrain = context.getConfiguration().get("traindata");
 			String filenameTest = context.getConfiguration().get("testdata");
+			// error check
+			System.out.println("Finished training and test data set up.\n");
 			
 			// set up paths for training and testing data
 			Path pathTrain = new Path(filenameTrain);
 			Path pathTest = new Path(filenameTest);
+			// error check
+			System.out.println("Finished setting up paths.\n");
 			
 			// update file systems
 			fsTrain = pathTrain.getFileSystem(conf);
 			fsTest = pathTest.getFileSystem(conf);
+			// error check
+			System.out.println("Finished updating file systems.\n");
 			
 			SetupTrainSet(fsTrain, pathTrain.toString());
 			SetupTestSet(fsTest, pathTest.toString());
+			// error check
+			System.out.println("Finished setup methods for training and testing data.\n");
+			
 				
 		} else {
 			  System.err.println("Error in reading data files");
