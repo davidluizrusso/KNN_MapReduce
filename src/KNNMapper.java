@@ -130,31 +130,31 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			while((line = reader.readLine()) != null) {
 			
 				// instantiate new instance of PokerHandTrain and StringTokenizer
-				PokerHandTrain phTrain = new PokerHandTrain();
+				PokerHandTest phTest = new PokerHandTest();
 				StringTokenizer st = new StringTokenizer(line, ",");
 				
 				while (st.hasMoreElements()) {
 					// first card
-					phTrain.setSuit1(Integer.parseInt(st.nextToken()));
-					phTrain.setRank1(Integer.parseInt(st.nextToken()));
+					phTest.setSuit1(Integer.parseInt(st.nextToken()));
+					phTest.setRank1(Integer.parseInt(st.nextToken()));
 					// second card
-					phTrain.setSuit2(Integer.parseInt(st.nextToken()));
-					phTrain.setRank2(Integer.parseInt(st.nextToken()));
+					phTest.setSuit2(Integer.parseInt(st.nextToken()));
+					phTest.setRank2(Integer.parseInt(st.nextToken()));
 					// third card
-					phTrain.setSuit3(Integer.parseInt(st.nextToken()));
-					phTrain.setRank3(Integer.parseInt(st.nextToken()));
+					phTest.setSuit3(Integer.parseInt(st.nextToken()));
+					phTest.setRank3(Integer.parseInt(st.nextToken()));
 					// fourth card
-					phTrain.setSuit4(Integer.parseInt(st.nextToken()));
-					phTrain.setRank4(Integer.parseInt(st.nextToken()));
+					phTest.setSuit4(Integer.parseInt(st.nextToken()));
+					phTest.setRank4(Integer.parseInt(st.nextToken()));
 					// fifth card
-					phTrain.setSuit5(Integer.parseInt(st.nextToken()));
-					phTrain.setRank5(Integer.parseInt(st.nextToken()));
-					// identity
-					phTrain.setIdentity(Integer.parseInt(st.nextToken()));
+					phTest.setSuit5(Integer.parseInt(st.nextToken()));
+					phTest.setRank5(Integer.parseInt(st.nextToken()));
+					// predicted identity 
+					phTest.setPredicted(Integer.parseInt("99"));
 	            }
 
 				
-				train.add(phTrain);
+				test.add(phTest);
 					
 				}
 
@@ -402,6 +402,13 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		public void setRank5(int rank5) {
 			this.rank5 = rank5;
 		}
+		public int getPredicted() {
+			return predicted;
+		}
+		public void setPredicted(int predicted) {
+			this.predicted = predicted;
+		}	
+	
 		@Override
 		public void readFields(DataInput arg0) throws IOException {
 			// TODO Auto-generated method stub
