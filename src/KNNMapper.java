@@ -211,7 +211,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			phTest.setSuit5(Integer.parseInt(st.nextToken()));
 			phTest.setRank5(Integer.parseInt(st.nextToken()));
 			// predicted identity 
-			phTest.setPredicted(Integer.parseInt("9999"));
+			phTest.setPredicted(9999);
         }
 		
 		IntWritable num = new IntWritable(9999);
@@ -385,7 +385,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 					+ ", suit2=" + suit2 + ", rank2=" + rank2 + ", suit3="
 					+ suit3 + ", rank3=" + rank3 + ", suit4=" + suit4
 					+ ", rank4=" + rank4 + ", suit5=" + suit5 + ", rank5="
-					+ rank5 + "]";
+					+ rank5 + ", predicted= " + predicted + "]";
 		}
 		public int getSuit1() {
 			return suit1;
