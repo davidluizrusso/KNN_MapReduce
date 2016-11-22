@@ -150,7 +150,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 					phTest.setSuit5(Integer.parseInt(st.nextToken()));
 					phTest.setRank5(Integer.parseInt(st.nextToken()));
 					// predicted identity 
-					phTest.setPredicted(Integer.parseInt("99"));
+					phTest.setPredicted(Integer.parseInt("9999"));
 	            }
 
 				
@@ -174,6 +174,38 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			System.err.println(e.getMessage());
 		}
  	} // end SetupTestSet method
+	
+	public void map(LongWritable key, Text value, Context context)
+			throws IOException, InterruptedException {
+
+		StringTokenizer st = new StringTokenizer(value.toString(), ",");
+		PokerHandTest phTest = new PokerHandTest();
+					
+		while (st.hasMoreElements()) {
+			// first card
+			phTest.setSuit1(Integer.parseInt(st.nextToken()));
+			phTest.setRank1(Integer.parseInt(st.nextToken()));
+			// second card
+			phTest.setSuit2(Integer.parseInt(st.nextToken()));
+			phTest.setRank2(Integer.parseInt(st.nextToken()));
+			// third card
+			phTest.setSuit3(Integer.parseInt(st.nextToken()));
+			phTest.setRank3(Integer.parseInt(st.nextToken()));
+			// fourth card
+			phTest.setSuit4(Integer.parseInt(st.nextToken()));
+			phTest.setRank4(Integer.parseInt(st.nextToken()));
+			// fifth card
+			phTest.setSuit5(Integer.parseInt(st.nextToken()));
+			phTest.setRank5(Integer.parseInt(st.nextToken()));
+			// predicted identity 
+			phTest.setPredicted(Integer.parseInt("9999"));
+        }
+		
+		IntWritable num = new IntWritable(9999);
+		System.out.println(phTest.toString());
+		context.write(value, num);
+	
+	} // end the map method
 	
 	
 	
