@@ -28,8 +28,10 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	
 	public void setup(Context context) throws IOException, InterruptedException
 	{
-		if (context.getCacheFiles() != null && context.getCacheFiles().length > 0)
-		{
+		// error check
+		System.out.println("Start of error checking.\n");
+		try{
+		// if (context.getCacheFiles() != null && context.getCacheFiles().length > 0){
 			// establish configuration and file system
 			Configuration conf = context.getConfiguration();
 			FileSystem fsTrain = FileSystem.get(conf);
@@ -61,10 +63,10 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			System.out.println("Finished setup methods for training and testing data.\n");
 			
 				
-		} else {
+		} catch(IOException ioe) {
 			  System.err.println("Error in reading data files");
 			  System.exit(-1);
-			}		
+			} // end try catch	
 	} // end setup method 
 	
 	public void SetupTrainSet(FileSystem fs, String filename) throws IOException {
