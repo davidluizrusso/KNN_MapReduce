@@ -22,10 +22,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	
 	ArrayList<PokerHand> train = new ArrayList<PokerHand>();
-	
-	
-
-	
+		
 	public void setup(Context context) throws IOException, InterruptedException
 	{
 		// error check
@@ -155,6 +152,21 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	
 	} // end the map method
 	
+	public int ClassifyTestData(PokerHand ph){
+		
+		
+		
+		return 0;
+
+    } // end ClassifyTestData method
+	
+	public float GetDistance(PokerHand ph){
+		
+		
+		
+		return 0;
+		
+	} // end GetDistance method
 	
 	
 	class PokerHand implements WritableComparable<PokerHand> {
