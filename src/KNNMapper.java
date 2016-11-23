@@ -122,67 +122,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			System.err.println(e.getMessage());
 		}
  	} // end SetupTrainSet method
-	
-	
-	public void SetupTestSet(FileSystem fs, String filename) throws IOException {
-
-		// This will reference one line at a time
-        	String line = null;
-
-		try {
 			
-			FSDataInputStream fis = fs.open( new Path(filename));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-
-			// parse each line
-			while((line = reader.readLine()) != null) {
-			
-				// instantiate new instance of PokerHandTrain and StringTokenizer
-				PokerHandTest phTest = new PokerHandTest();
-				StringTokenizer st = new StringTokenizer(line, ",");
-				
-				while (st.hasMoreElements()) {
-					// first card
-					phTest.setSuit1(Integer.parseInt(st.nextToken()));
-					phTest.setRank1(Integer.parseInt(st.nextToken()));
-					// second card
-					phTest.setSuit2(Integer.parseInt(st.nextToken()));
-					phTest.setRank2(Integer.parseInt(st.nextToken()));
-					// third card
-					phTest.setSuit3(Integer.parseInt(st.nextToken()));
-					phTest.setRank3(Integer.parseInt(st.nextToken()));
-					// fourth card
-					phTest.setSuit4(Integer.parseInt(st.nextToken()));
-					phTest.setRank4(Integer.parseInt(st.nextToken()));
-					// fifth card
-					phTest.setSuit5(Integer.parseInt(st.nextToken()));
-					phTest.setRank5(Integer.parseInt(st.nextToken()));
-					// predicted identity 
-					phTest.setPredicted(Integer.parseInt("9999"));
-	            }
-
-				
-				test.add(phTest);
-					
-				}
-
-			//  close files
-            reader.close();
-			fis.close();
-			System.out.println("Finished Setup");
-		}
-
-		catch (IllegalArgumentException ill) {
-			System.err.println(ill.getMessage());
-		}
-		catch (IOException ioe) {
-			System.err.println(ioe.getMessage());
-		}
-		catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
- 	} // end SetupTestSet method
-	
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
 
