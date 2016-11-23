@@ -21,8 +21,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	
-	ArrayList<PokerHandTrain> train = new ArrayList<PokerHandTrain>();
-	ArrayList<PokerHandTest> test = new ArrayList<PokerHandTest>();
+	ArrayList<PokerHand> train = new ArrayList<PokerHand>();
+	
 	
 
 	
@@ -78,7 +78,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			while((line = reader.readLine()) != null) {
 			
 				// instantiate new instance of PokerHandTrain and StringTokenizer
-				PokerHandTrain phTrain = new PokerHandTrain();
+				PokerHand phTrain = new PokerHand();
 				StringTokenizer st = new StringTokenizer(line, ",");
 				
 				while (st.hasMoreElements()) {
@@ -127,7 +127,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			throws IOException, InterruptedException {
 
 		StringTokenizer st = new StringTokenizer(value.toString(), ",");
-		PokerHandTest phTest = new PokerHandTest();
+		PokerHand phTest = new PokerHand();
 					
 		while (st.hasMoreElements()) {
 			// first card
@@ -146,7 +146,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			phTest.setSuit5(Integer.parseInt(st.nextToken()));
 			phTest.setRank5(Integer.parseInt(st.nextToken()));
 			// predicted identity 
-			phTest.setPredicted(9999);
+			phTest.setIdentity(9999);
         }
 		
 		IntWritable num = new IntWritable(9999);
@@ -157,11 +157,11 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	
 	
 	
-	class PokerHandTrain implements WritableComparable<PokerHandTrain> {
+	class PokerHand implements WritableComparable<PokerHand> {
 		
 		/* 
-		 * The PokerHandTrain class is for holding data of the form
-		 * of a training set of poker hands. There are 11 attributes.
+		 * The PokerHand class is for holding data of the form
+		 * of a poker hand. There are 11 attributes.
 		 * The hand consists of five cards, each having a suit and
 		 * a rank. 
 		 * Suit: Ordinal (1-4) representing {Hearts, Spades, Diamonds, Clubs}
@@ -284,128 +284,13 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		}
 
 		@Override
-		public int compareTo(PokerHandTrain o) {
+		public int compareTo(PokerHand o) {
 			// TODO Auto-generated method stub
 			return 0;
 		}
 	
 	} // end PokerHandTrain class
 	
-	class PokerHandTest implements WritableComparable<PokerHandTest> {
-		
-		/* 
-		 * The PokerHandTrain class is for holding data of the form
-		 * of a training set of poker hands. There are 10 attributes.
-		 * The hand consists of five cards, each having a suit and
-		 * a rank. 
-		 * Suit: Ordinal (1-4) representing {Hearts, Spades, Diamonds, Clubs}
-		 * Rank: Numerical (1-13) representing (Ace, 2, 3, ... , Queen, King)
-		*/
-		
-		int suit1; // suit of first card
-        int rank1; // rank of first card
-        int suit2; // suit of second card
-        int rank2; // rank of second card
-        int suit3; // suit of third card
-        int rank3; // rank of third card
-        int suit4; // suit of fourth card
-        int rank4; // rank of fourth card
-        int suit5; // suit of fifth card
-        int rank5; // rank of fifth card
-        int predicted; // predicted name of hand
-		
-		@Override
-		public String toString() {
-			return "PokerHandTest [suit1=" + suit1 + ", rank1=" + rank1
-					+ ", suit2=" + suit2 + ", rank2=" + rank2 + ", suit3="
-					+ suit3 + ", rank3=" + rank3 + ", suit4=" + suit4
-					+ ", rank4=" + rank4 + ", suit5=" + suit5 + ", rank5="
-					+ rank5 + ", predicted= " + predicted + "]";
-		}
-		public int getSuit1() {
-			return suit1;
-		}
-		public void setSuit1(int suit1) {
-			this.suit1 = suit1;
-		}
-		public int getRank1() {
-			return rank1;
-		}
-		public void setRank1(int rank1) {
-			this.rank1 = rank1;
-		}
-		public int getSuit2() {
-			return suit2;
-		}
-		public void setSuit2(int suit2) {
-			this.suit2 = suit2;
-		}
-		public int getRank2() {
-			return rank2;
-		}
-		public void setRank2(int rank2) {
-			this.rank2 = rank2;
-		}
-		public int getSuit3() {
-			return suit3;
-		}
-		public void setSuit3(int suit3) {
-			this.suit3 = suit3;
-		}
-		public int getRank3() {
-			return rank3;
-		}
-		public void setRank3(int rank3) {
-			this.rank3 = rank3;
-		}
-		public int getSuit4() {
-			return suit4;
-		}
-		public void setSuit4(int suit4) {
-			this.suit4 = suit4;
-		}
-		public int getRank4() {
-			return rank4;
-		}
-		public void setRank4(int rank4) {
-			this.rank4 = rank4;
-		}
-		public int getSuit5() {
-			return suit5;
-		}
-		public void setSuit5(int suit5) {
-			this.suit5 = suit5;
-		}
-		public int getRank5() {
-			return rank5;
-		}
-		public void setRank5(int rank5) {
-			this.rank5 = rank5;
-		}
-		public int getPredicted() {
-			return predicted;
-		}
-		public void setPredicted(int predicted) {
-			this.predicted = predicted;
-		}	
 	
-		@Override
-		public void readFields(DataInput arg0) throws IOException {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public void write(DataOutput arg0) throws IOException {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public int compareTo(PokerHandTest o) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-        
-	} // end PokerHandTest class 
 	
 } // end KNNMapper class
