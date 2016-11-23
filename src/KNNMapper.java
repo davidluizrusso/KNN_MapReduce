@@ -31,37 +31,32 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		// error check
 		System.out.println("Start of error checking.\n");
 		try{
-		// if (context.getCacheFiles() != null && context.getCacheFiles().length > 0){
-			// establish configuration and file system
+
 			Configuration conf = context.getConfiguration();
 			FileSystem fsTrain = FileSystem.get(conf);
-			FileSystem fsTest = FileSystem.get(conf);
 			// error check
 			System.out.println("Finished config and file systems.\n");
 			
-			// get training and test data
+			// only the training data should be read in the setup() method
 			String filenameTrain = context.getConfiguration().get("traindata");
-			String filenameTest = context.getConfiguration().get("testdata");
 			// error check
-			System.out.println("Finished training and test data set up.\n");
+			System.out.println("Finished training data set up.\n");
 			
-			// set up paths for training and testing data
+			// set up path for training data
 			Path pathTrain = new Path(filenameTrain);
-			Path pathTest = new Path(filenameTest);
 			// error check
 			System.out.println("Finished setting up paths.\n");
 			
 			// update file systems
 			fsTrain = pathTrain.getFileSystem(conf);
-			fsTest = pathTest.getFileSystem(conf);
 			// error check
 			System.out.println("Finished updating file systems.\n");
 			
 			SetupTrainSet(fsTrain, pathTrain.toString());
-			SetupTestSet(fsTest, pathTest.toString());
 			// error check
-			System.out.println("Finished setup methods for training and testing data.\n");
-			
+			System.out.println("Finished setup methods for training data.\n");
+			// System.out.println("Example training data: \n");
+			// System.out.println(train.toString());
 				
 		} catch(IOException ioe) {
 			  System.err.println("Error in reading data files");
