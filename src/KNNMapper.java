@@ -4,6 +4,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.lang.Math;
@@ -20,40 +21,51 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 
 public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
-	
+
+	// instantiate a new ArrayList of PokerHand
 	ArrayList<PokerHand> train = new ArrayList<PokerHand>();
-		
+	// instantiate a new ArrayList of Neighbors
+	ArrayList<Neighbor> nearestNeighbors = new ArrayList<Neighbor>();
+			
 	public void setup(Context context) throws IOException, InterruptedException
 	{
 		// error check
-		System.out.println("Start of error checking.\n");
+		System.out.println("Step 0: Start of error checking.\n");
 		try{
 
 			Configuration conf = context.getConfiguration();
 			FileSystem fsTrain = FileSystem.get(conf);
 			// error check
-			System.out.println("Finished config and file systems.\n");
+			System.out.println("Step 1: Finished config and file systems.\n");
 			
 			// only the training data should be read in the setup() method
 			String filenameTrain = context.getConfiguration().get("traindata");
 			// error check
-			System.out.println("Finished training data set up.\n");
+			System.out.println("Step 2: Finished training data set up.\n");
 			
 			// set up path for training data
 			Path pathTrain = new Path(filenameTrain);
 			// error check
-			System.out.println("Finished setting up paths.\n");
+			System.out.println("Step 3: Finished setting up paths.\n");
 			
 			// update file systems
 			fsTrain = pathTrain.getFileSystem(conf);
 			// error check
-			System.out.println("Finished updating file systems.\n");
+			System.out.println("Step 4: Finished updating file systems.\n");
 			
-			SetupTrainSet(fsTrain, pathTrain.toString());
+			setupTrainSet(fsTrain, pathTrain.toString());
 			// error check
-			System.out.println("Finished setup methods for training data.\n");
+			System.out.println("Step 5: Finished setup methods for training data.\n");
 			// System.out.println("Example training data: \n");
 			// System.out.println(train.toString());
+			
+			System.out.println("Step 6: Check nearest neighbors holding object contents.\n");
+			// initialize nearestNeighbors object
+			nearestNeighbors = setupInitialArrayList(3);
+			// error check
+			for(int i = 0; i < nearestNeighbors.size(); i++){
+				System.out.println(nearestNeighbors.get(i).toString());
+			}
 				
 		} catch(IOException ioe) {
 			  System.err.println("Error in reading data files");
@@ -61,7 +73,17 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			} // end try catch	
 	} // end setup method 
 	
-	public void SetupTrainSet(FileSystem fs, String filename) throws IOException {
+	private ArrayList<Neighbor> setupInitialArrayList(int k) {
+		// instantiate a new ArrayList of Neighbor
+		ArrayList<Neighbor> nn = new ArrayList<Neighbor>();
+		// populate the ArrayList with dummy values
+		for(int i = 0; i < k; i++){
+			nn.set(i, new Neighbor(999, 9999999));
+		}		
+		return nn;	
+	} // end setupInitialArrayList method
+
+	public void setupTrainSet(FileSystem fs, String filename) throws IOException {
 
 		// This will reference one line at a time
         	String line = null;
@@ -125,7 +147,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
 		StringTokenizer st = new StringTokenizer(value.toString(), ",");
 		PokerHand phTest = new PokerHand();
-					
+						
 		while (st.hasMoreElements()) {
 			// first card
 			phTest.setSuit1(Integer.parseInt(st.nextToken()));
@@ -148,25 +170,53 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		
 		IntWritable num = new IntWritable(9999);
 		System.out.println(phTest.toString());
+		System.out.println(nearestNeighbors.toString());
 		context.write(value, num);
 	
 	} // end the map method
 	
 	public int ClassifyTestData(PokerHand ph){
 		
+		// calculate distances between given training data and each row of testing data
+		for(int i = 0; i < train.size(); i++){
+			
+		// sort the nearestNeighbors object and get the maximum distance in nearestNeighbors 
+		Collections.sort(nearestNeighbors); // sorts in ascending order
+		float maxDist = nearestNeighbors.get(1).getDistance();
+		
+		// calculate distance
+		float candidateDistance = CalcDistance(ph, train.get(i));
+		
+			// if candidateDistance < maxDist, add it to nearestNeighbors
+			if(candidateDistance < maxDist){
+				nearestNeighbors.set(1, new Neighbor(train.get(i).getIdentity(), candidateDistance));  
+			}						
+		} // end for loop
 		
 		
-		return 0;
+		
+		
+		return 1;
 
     } // end ClassifyTestData method
 	
-	public float GetDistance(PokerHand ph){
+	public float CalcDistance(PokerHand ph1, PokerHand ph2){
+				
+		float distance = (
+				(ph1.getSuit1()-ph2.getSuit1())*(ph1.getSuit1()-ph2.getSuit1()) + 
+				(ph1.getRank1()-ph2.getRank1())*(ph1.getRank1()-ph2.getRank1()) +
+				(ph1.getSuit2()-ph2.getSuit2())*(ph1.getSuit2()-ph2.getSuit2()) + 
+				(ph1.getRank2()-ph2.getRank2())*(ph1.getRank2()-ph2.getRank2()) +
+				(ph1.getSuit3()-ph2.getSuit3())*(ph1.getSuit3()-ph2.getSuit3()) + 
+				(ph1.getRank3()-ph2.getRank3())*(ph1.getRank3()-ph2.getRank3()) +
+				(ph1.getSuit4()-ph2.getSuit4())*(ph1.getSuit4()-ph2.getSuit4()) + 
+				(ph1.getRank4()-ph2.getRank4())*(ph1.getRank4()-ph2.getRank4()) +
+				(ph1.getSuit5()-ph2.getSuit5())*(ph1.getSuit5()-ph2.getSuit5()) + 
+				(ph1.getRank5()-ph2.getRank5())*(ph1.getRank5()-ph2.getRank5())
+				);
+		return distance;
 		
-		
-		
-		return 0;
-		
-	} // end GetDistance method
+	} // end CalcDistance method
 	
 	
 	class PokerHand implements WritableComparable<PokerHand> {
@@ -282,26 +332,104 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		public void setIdentity(int identity) {
 			this.identity = identity;
 		}
+		
+		// PokerHand ph = new PokerHand();
 
 		@Override
-		public void readFields(DataInput arg0) throws IOException {
-			// TODO Auto-generated method stub
-			
-		}
+		public void readFields(DataInput in) throws IOException {
+			/* ph.setSuit1(in.readInt());
+			ph.setRank1(in.readInt());
+			ph.setSuit2(in.readInt());
+			ph.setRank2(in.readInt());
+			ph.setSuit3(in.readInt());
+			ph.setRank3(in.readInt());
+			ph.setSuit4(in.readInt());
+			ph.setRank4(in.readInt());
+			ph.setSuit5(in.readInt());
+			ph.setRank5(in.readInt());
+			ph.setIdentity(in.readInt());
+			*/			
+		} // end readFiles
 
 		@Override
-		public void write(DataOutput arg0) throws IOException {
-			// TODO Auto-generated method stub
-			
-		}
+		public void write(DataOutput out) throws IOException {
+			/* out.writeInt(ph.getSuit1());
+			out.writeInt(ph.getRank1());
+			out.writeInt(ph.getSuit2());
+			out.writeInt(ph.getRank2());
+			out.writeInt(ph.getSuit3());
+			out.writeInt(ph.getRank3());
+			out.writeInt(ph.getSuit4());
+			out.writeInt(ph.getRank4());
+			out.writeInt(ph.getSuit5());
+			out.writeInt(ph.getRank5());
+			out.writeInt(ph.getIdentity());	
+			*/ 		
+		} // end write
 
 		@Override
 		public int compareTo(PokerHand o) {
-			// TODO Auto-generated method stub
+			/* if(ph.getSuit1() == o.getSuit1() &
+			   ph.getRank1() == o.getRank1() &
+			   ph.getSuit2() == o.getSuit2() &
+			   ph.getRank2() == o.getRank2() &
+			   ph.getSuit3() == o.getSuit3() &
+			   ph.getRank3() == o.getRank3() &
+			   ph.getSuit4() == o.getSuit4() &
+			   ph.getRank4() == o.getRank4() &
+			   ph.getSuit5() == o.getSuit5() &
+			   ph.getRank5() == o.getRank5() &
+			   ph.getIdentity() == o.getIdentity()){
+				return 0;
+			} else {
+				return 1;
+			}*/
 			return 0;
-		}
+		} // end compareTo
 	
-	} // end PokerHandTrain class
+	} // end PokerHand class
+	
+	class Neighbor implements Comparable<Neighbor>{
+
+		int identity;
+		float distance;
+		
+		// constructor class 
+		public Neighbor(int identity, float distance) {
+			this.identity = identity;
+			this.distance = distance;
+		}
+		
+		public int getIdentity() {
+			return identity;
+		}
+		public void setIdentity(int identity) {
+			this.identity = identity;
+		}
+		public float getDistance() {
+			return distance;
+		}
+		public void setDistance(float distance) {
+			this.distance = distance;
+		}
+		
+		@Override
+		public String toString() {
+			return "Neighbor [identity=" + identity + ", distance=" + distance
+					+ "]";
+		}
+		
+		// compareTo method
+		@Override
+		public int compareTo(Neighbor n) {
+			if (this.distance > n.distance) return 1;
+            else if (this.distance < n.distance) return -1;
+            else return 0;
+		}
+		
+	}
+	
+	
 	
 	
 	

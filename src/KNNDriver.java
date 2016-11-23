@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.*;        
+
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
@@ -15,7 +16,8 @@ public class KNNDriver {
 	    
 		// iniate configuration and job
 		Configuration conf = new Configuration(); 
-	    Job job = new Job(conf, "PokerHand");
+	    @SuppressWarnings("deprecation")
+		Job job = new Job(conf, "PokerHand");
 
 	    // set testing and training data parameters within the job
 		job.getConfiguration().set("traindata", args[0]);
