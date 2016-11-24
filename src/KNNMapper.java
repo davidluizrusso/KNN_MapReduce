@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.lang.Math;
 
@@ -19,6 +21,8 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Mapper;
+
+import com.jcraft.jsch.Random;
 
 
 public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
@@ -127,10 +131,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
-		
-		// error checking
-		System.out.println("Mapper Check: -----------------------");
-		
+				
 		StringTokenizer st = new StringTokenizer(value.toString(), ",");
 		PokerHand phTest = new PokerHand();
 						
@@ -178,14 +179,10 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			}						
 		} // end for loop
 		
-		
-		// System.out.println(nearestNeighbors.toString());
-		
 		// initialize a HashMap to count occurrences of neighbors
 		HashMap<String, Integer> hm = new HashMap<String, Integer>();
 		for(int i = 0; i < nearestNeighbors.size(); i++){
-			
-			
+						
 			int idInt = nearestNeighbors.get(i).getIdentity();
 			String id = Integer.toString(idInt);
 			
@@ -197,7 +194,35 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			}
 		}
 		
-		System.out.println(hm.toString());
+		// find take majority vote using the iterator class
+    	Set candidates = hm.keySet();
+    	Iterator<String> itr = candidates.iterator();
+    	
+    	// determine winning flower
+    	String winnerName = "?"; //initialize winnerName
+    	int winnerCount = 0; // initialize winnerCount
+    	boolean tie = false; // initialize tie boolean
+    	
+    	while(itr.hasNext()){
+    		String handCat = itr.next();
+    		int votes = hm.get(handCat).intValue();
+    		
+    		if(votes > winnerCount){ //update winnerCount and flowerName if new winner is found
+    			winnerName = handCat;
+    			winnerCount = votes;
+    			tie = false; //keep tie as false
+    		} else if(votes == winnerCount) {
+    			tie = true;	 //set tie to true
+    			winnerName = Integer.toString(0);
+    		}
+    	}
+    	
+    	phTest.setIdentity(Integer.parseInt(winnerName));
+    	
+    	System.out.println(phTest.toString());
+
+
+		
 		
 		// Text result = new Text(KnnClass);
 		// context.write(value, result);
