@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.lang.Math;
@@ -24,48 +25,40 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
 	// instantiate a new ArrayList of PokerHand
 	ArrayList<PokerHand> train = new ArrayList<PokerHand>();
-	// instantiate a new ArrayList of Neighbors
-	ArrayList<Neighbor> nearestNeighbors = new ArrayList<Neighbor>();
-			
+
+		
 	public void setup(Context context) throws IOException, InterruptedException
 	{
 		// error check
-		System.out.println("Step 0: Start of error checking.\n");
+		System.out.println("Step 0: Setup initiating.\n");
 		try{
 
 			Configuration conf = context.getConfiguration();
 			FileSystem fsTrain = FileSystem.get(conf);
 			// error check
-			System.out.println("Step 1: Finished config and file systems.\n");
+			// System.out.println("Step 1: Finished config and file systems.\n");
 			
 			// only the training data should be read in the setup() method
 			String filenameTrain = context.getConfiguration().get("traindata");
 			// error check
-			System.out.println("Step 2: Finished training data set up.\n");
+			//System.out.println("Step 2: Finished training data set up.\n");
 			
 			// set up path for training data
 			Path pathTrain = new Path(filenameTrain);
 			// error check
-			System.out.println("Step 3: Finished setting up paths.\n");
+			//System.out.println("Step 3: Finished setting up paths.\n");
 			
 			// update file systems
 			fsTrain = pathTrain.getFileSystem(conf);
 			// error check
-			System.out.println("Step 4: Finished updating file systems.\n");
+			//System.out.println("Step 4: Finished updating file systems.\n");
 			
 			setupTrainSet(fsTrain, pathTrain.toString());
 			// error check
-			System.out.println("Step 5: Finished setup methods for training data.\n");
+			//System.out.println("Step 5: Finished setup methods for training data.\n");
 			// System.out.println("Example training data: \n");
 			// System.out.println(train.toString());
 			
-			System.out.println("Step 6: Check nearest neighbors holding object contents.\n");
-			// initialize nearestNeighbors object
-			nearestNeighbors = setupInitialArrayList(3);
-			// error check
-			for(int i = 0; i < nearestNeighbors.size(); i++){
-				System.out.println(nearestNeighbors.get(i).toString());
-			}
 				
 		} catch(IOException ioe) {
 			  System.err.println("Error in reading data files");
@@ -73,18 +66,8 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			} // end try catch	
 	} // end setup method 
 	
-	private ArrayList<Neighbor> setupInitialArrayList(int k) {
-		// instantiate a new ArrayList of Neighbor
-		ArrayList<Neighbor> nn = new ArrayList<Neighbor>();
-		// populate the ArrayList with dummy values
-		for(int i = 0; i < k; i++){
-			nn.set(i, new Neighbor(999, 9999999));
-		}		
-		return nn;	
-	} // end setupInitialArrayList method
-
 	public void setupTrainSet(FileSystem fs, String filename) throws IOException {
-
+		System.out.println("Begin: Read in training set. ");
 		// This will reference one line at a time
         	String line = null;
 
@@ -128,7 +111,7 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			//  close files
             reader.close();
 			fis.close();
-			System.out.println("Finished Setup");
+			System.out.println("End: Read in training set. ");
 		}
 
 		catch (IllegalArgumentException ill) {
@@ -144,7 +127,10 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
-
+		
+		// error checking
+		System.out.println("Mapper Check: -----------------------");
+		
 		StringTokenizer st = new StringTokenizer(value.toString(), ",");
 		PokerHand phTest = new PokerHand();
 						
@@ -168,37 +154,55 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			phTest.setIdentity(9999);
         }
 		
-		IntWritable num = new IntWritable(9999);
-		System.out.println(phTest.toString());
-		System.out.println(nearestNeighbors.toString());
-		context.write(value, num);
-	
-	} // end the map method
-	
-	public int ClassifyTestData(PokerHand ph){
+		
+		// instantiate a new ArrayList of neighbors
+		ArrayList<Neighbor> nearestNeighbors = new ArrayList<Neighbor>();
+		
+		// populate the nearest neighbors with dummy values 
+		for(int i = 0; i < 3; i++){
+			nearestNeighbors.add(new Neighbor(999, 999999999));
+		}
+
 		
 		// calculate distances between given training data and each row of testing data
 		for(int i = 0; i < train.size(); i++){
-			
+					
 		// sort the nearestNeighbors object and get the maximum distance in nearestNeighbors 
 		Collections.sort(nearestNeighbors); // sorts in ascending order
-		float maxDist = nearestNeighbors.get(1).getDistance();
-		
+		float maxDist = nearestNeighbors.get(0).getDistance();		
 		// calculate distance
-		float candidateDistance = CalcDistance(ph, train.get(i));
-		
-			// if candidateDistance < maxDist, add it to nearestNeighbors
-			if(candidateDistance < maxDist){
-				nearestNeighbors.set(1, new Neighbor(train.get(i).getIdentity(), candidateDistance));  
+		float candidateDistance = CalcDistance(phTest, train.get(i));		
+		// if candidateDistance < maxDist, add it to nearestNeighbors
+		if(candidateDistance < maxDist){
+			nearestNeighbors.set(nearestNeighbors.size()-1, new Neighbor(train.get(i).getIdentity(), candidateDistance));  
 			}						
 		} // end for loop
 		
 		
+		// System.out.println(nearestNeighbors.toString());
 		
+		// initialize a HashMap to count occurrences of neighbors
+		HashMap<String, Integer> hm = new HashMap<String, Integer>();
+		for(int i = 0; i < nearestNeighbors.size(); i++){
+			
+			
+			int idInt = nearestNeighbors.get(i).getIdentity();
+			String id = Integer.toString(idInt);
+			
+			if(!hm.containsKey(id)){
+				hm.put(id, new Integer(1));
+			} else {
+				int currentCount = hm.get(id).intValue();
+				hm.put(id, new Integer(currentCount + 1));
+			}
+		}
 		
-		return 1;
-
-    } // end ClassifyTestData method
+		System.out.println(hm.toString());
+		
+		// Text result = new Text(KnnClass);
+		// context.write(value, result);
+	} // end the map method
+	
 	
 	public float CalcDistance(PokerHand ph1, PokerHand ph2){
 				
@@ -428,9 +432,5 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		}
 		
 	}
-	
-	
-	
-	
 	
 } // end KNNMapper class
