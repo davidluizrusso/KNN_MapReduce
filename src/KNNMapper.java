@@ -217,15 +217,15 @@ public class KNNMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
     		}
     	}
     	
-    	phTest.setIdentity(Integer.parseInt(winnerName));
+    	// phTest.setIdentity(Integer.parseInt(winnerName));
     	
-    	System.out.println(phTest.toString());
-
-
+    	// System.out.println(phTest.toString());
 		
-		
-		// Text result = new Text(KnnClass);
-		// context.write(value, result);
+    	Text result = new Text(winnerName);
+    	IntWritable one = new IntWritable(1);
+
+		context.write(result, one);
+    	
 	} // end the map method
 	
 	

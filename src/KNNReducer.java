@@ -1,17 +1,19 @@
 import java.io.IOException;
 import java.util.Iterator;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
 
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapreduce.*;
+public class KNNReducer extends Reducer<Text, Text, Text, Text> {
 
-public class KNNReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-
-	public void reduce(Text key, Iterable<IntWritable> values, Context context) 
-		      throws IOException, InterruptedException {
-		        int sum = 0;
-		        System.out.println("Reduce check");
-		        context.write(key, new IntWritable(sum));
-} // end reduce class 
-	
-	
-} // end KNNReducer class 
+	// Mapper did all the hard work so it just needs to print the results
+	public void reduce(Text key, Iterable<Text> values,	Context context) 
+			throws IOException, InterruptedException {
+		
+		Iterator<Text> it = values.iterator();
+		Text value = it.next();
+		
+		String s = String.format("   (%s)", String.valueOf(value));
+		Text result = new Text(s);
+		context.write(key, result);
+	}
+}
